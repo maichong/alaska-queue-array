@@ -15,16 +15,17 @@ function sleep(seconds) {
 }
 
 /**
- *
- * @type {{}}
+ * @type {object}
  */
 const queues = {};
 
 class ArrayQueueDriver {
 
   constructor(key, options) {
-    this._queue = [];
     this.key = key;
+    if (!queues[key]) {
+      queues[key] = [];
+    }
   }
 
   /**
@@ -33,42 +34,31 @@ class ArrayQueueDriver {
    * @returns {boolean}
    */
   async push(item) {
-    this._queue.push(item);
+    queues[this.key].push(item);
     return true;
   }
 
   /**
    * [async] 读取队列中的元素
-   * @param {number} timeout 超时时间,单位秒
+   * @param {number} timeout 超时时间,单位秒,默认Infinity
    * @returns {boolean}
    */
   async pop(timeout) {
-    while (!this._queue.length && timeout > 0) {
+    if (timeout === undefined) {
+      timeout = Infinity;
+    }
+    while (!queues[this.key].length && timeout > 0) {
       await sleep(1);
       timeout--;
     }
-    return this._queue.shift();
+    return queues[this.key].shift();
   }
 
   /**
    * 销毁队列
    */
   destory() {
-    this._queue = [];
-    delete queues[this.key];
-  }
-
-  /**
-   * 通过Key
-   * @param {string} key
-   * @param {object} options
-   * @returns {ArrayQueueDriver}
-   */
-  static instance(key, options) {
-    if (!queues[key]) {
-      queues[key] = new ArrayQueueDriver(key, options);
-    }
-    return queues[key];
+    //This package may cause memory leak.
   }
 }
 
