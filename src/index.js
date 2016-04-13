@@ -15,7 +15,7 @@ function sleep(seconds) {
 }
 
 /**
- * @type {object}
+ * @type {Object}
  */
 const queues = {};
 
