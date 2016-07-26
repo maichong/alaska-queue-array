@@ -1,11 +1,15 @@
 {
   "name": "alaska-queue-array",
-  "version": "0.1.2",
+  "version": "0.10.0",
   "description": "Alaska array queue driver",
-  "main": "lib/index.js",
+  "keywords": [
+    "alaska",
+    "alaska-queue"
+  ],
+  "main": "index.js",
   "scripts": {
-    "build": "babel ./src --out-dir ./lib",
-    "watch": "babel ./src --out-dir ./lib -w",
+    "build": "babel ./src --out-dir ./",
+    "watch": "babel ./src --out-dir ./ -w",
     "prebuild": "rimraf lib",
     "prepublish": "npm run build"
   },

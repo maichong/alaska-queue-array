@@ -4,8 +4,6 @@
  * @author Liang <liang@maichong.it>
  */
 
-'use strict';
-
 function sleep(seconds) {
   return new Promise(function (resolve) {
     setTimeout(function () {
@@ -21,43 +19,59 @@ const queues = {};
 
 class ArrayQueueDriver {
 
-  constructor(key, options) {
-    this.key = key;
-    if (!queues[key]) {
-      queues[key] = [];
+  constructor(options) {
+    this.key = options.key;
+    this.options = options;
+    this.isQueueDriver = true;
+    this._free = false;
+    if (!queues[this.key]) {
+      queues[this.key] = [];
     }
   }
 
   /**
    * [async] 将元素插入队列
    * @param {*} item
-   * @returns {boolean}
    */
   async push(item) {
+    this._free = false;
     queues[this.key].push(item);
-    return true;
   }
 
   /**
    * [async] 读取队列中的元素
-   * @param {number} timeout 超时时间,单位秒,默认Infinity
-   * @returns {boolean}
+   * @param {number} timeout 超时时间,单位毫秒,默认不阻塞,为0则永久阻塞
+   * @returns {*}
    */
   async pop(timeout) {
-    if (timeout === undefined) {
+    this._free = false;
+    if (timeout === 0) {
       timeout = Infinity;
+    }
+    if (timeout === undefined) {
+      timeout = 0;
     }
     while (!queues[this.key].length && timeout > 0) {
       await sleep(1);
-      timeout--;
+      timeout -= 1000;
+      if (this._free) {
+        return;
+      }
     }
     return queues[this.key].shift();
   }
 
   /**
+   * 释放当前所有任务,进入空闲状态
+   */
+  free() {
+    this._free = true;
+  }
+
+  /**
    * 销毁队列
    */
-  destory() {
+  destroy() {
     //This package may cause memory leak.
   }
 }

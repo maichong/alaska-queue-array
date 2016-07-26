@@ -6,7 +6,9 @@ Alaska array queue driver
 ```javascript
 
 queue: {
-  type: 'alaska-queue-array'
+  type: 'alaska-queue-array',
+  key: 'myQueue',
+  idle: 5, // idle drivers count
 }
 
 ```
